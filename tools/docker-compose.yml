@@ -1,0 +1,32 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - asset_management_network
+
+  k6:
+    user: root
+    image: grafana/k6
+    container_name: k6
+    volumes:
+      - ./k6:/k6
+      - k6_results:/k6/results
+    working_dir: /k6
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["/k6/run_tests.sh"]
+    networks:
+      - asset_management_network
+  
+volumes:
+  k6_results:
+    name: k6_results
+    external: true
+  
+networks:
+  asset_management_network:
+    external: true
