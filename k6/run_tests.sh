@@ -1,31 +1,21 @@
 #!/bin/sh
-# Wait for backend to be ready
-BACKEND_HOST="backend"
-BACKEND_PORT=5000
 
-echo "Waiting for backend to be ready at $BACKEND_HOST:$BACKEND_PORT..."
-until nc -z "$BACKEND_HOST" "$BACKEND_PORT"; do
-  echo "Backend not ready yet..."
-  sleep 1
-done
-
-echo "Backend is ready. Starting performance tests."
-
-TEST_DIR="."
-RESULT_DIR="./results"
+TEST_DIR="/k6/scripts"
+RESULT_DIR="/k6_results"
 mkdir -p "$RESULT_DIR"
-chmod 777 "$RESULT_DIR"
 
+test_cases=$(find "$TEST_DIR" -maxdepth 1 -type f -name "TC_*.js")
 
-echo "Starting K6 performance tests..."
+if [ -z "$test_cases" ]; then
+    echo "No test cases found in $TEST_DIR"
+    exit 0
+fi
 
-for script in "$TEST_DIR"/scripts/TC-*.js; do
+for script in $test_cases; do   
     test_name=$(basename "$script" .js)
     timestamp=$(date +"%Y%m%d-%H%M%S")
     output_file="$RESULT_DIR/${test_name}.json"
-    # output_file="$RESULT_DIR/output.json"
     log_file="$RESULT_DIR/${test_name}.log"
-    # log_file="$RESULT_DIR/output.log"
 
     echo "Running $test_name..."
 
