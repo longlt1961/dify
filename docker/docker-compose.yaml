@@ -765,7 +765,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ../k6:/k6
+      - ./k6:/k6
       - k6_results:/k6_results
     networks:
       - ssrf_proxy_network
@@ -775,7 +775,7 @@ services:
     image: prom/prometheus
     container_name: prometheus
     volumes:
-      - ../prometheus:/etc/prometheus
+      - ./prometheus:/etc/prometheus
     ports:
       - "9090:9090"
     networks:
